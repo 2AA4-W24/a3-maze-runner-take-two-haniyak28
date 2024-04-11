@@ -16,7 +16,6 @@ public class MazeGraph implements MazeType {
     // Class to represent a cell in the maze
     // Convert maze to graph represented as an adjacency list
     Map<GraphNode, List<GraphNode>> mazeToGraph(List<List<Boolean>> maze) {
-        Map<GraphNode, List<GraphNode>> graph = new HashMap<>();
         int rows = maze.size();
         int cols = maze.get(0).size();
 
@@ -42,6 +41,16 @@ public class MazeGraph implements MazeType {
             }
         }
         return mazeGraph;
+    }
+
+    private Position StartNode() throws Exception {
+        for (int i = 0; i < maze.size(); i++) {
+            Position pos = new Position(0, i);
+            if (!isWall(pos)) {
+                return pos;
+            }
+        }
+        throw new Exception("Invalid maze (no start position available)");
     }
     /*private static void connectAdjacentNodes(List<List<GraphNode>> graph) {
         int numRows = graph.size();

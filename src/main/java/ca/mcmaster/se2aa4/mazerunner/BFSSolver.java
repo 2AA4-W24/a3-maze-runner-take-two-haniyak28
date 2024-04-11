@@ -1,85 +1,62 @@
 package ca.mcmaster.se2aa4.mazerunner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.*;
 public class BFSSolver implements MazeSolver{
     private static final Logger logger = LogManager.getLogger();
 
     @Override
     public Path solve(Maze maze) {
-        public Path BFSSolver(GraphNode[][] graph, GraphNode start, GraphNode end) {
-            // Queue for BFS traversal
-            Queue<GraphNode> queue = new ArrayDeque<>();
-            // Set to keep track of visited nodes
-            Set<GraphNode> visited = new HashSet<>();
-            // Map to store parent node for each node, for reconstructing the path
-            // Key: child node, Value: parent node
-            java.util.Map<GraphNode, GraphNode> parentMap = new java.util.HashMap<>();
 
-            // Add the start node to the queue and mark it as visited
-            queue.offer(start);
-            visited.add(start);
+            public static Path BFSSolver(GraphNode start, GraphNode end) {
+                Map<GraphNode, GraphNode> parentMap = new HashMap<>();
+                Queue<GraphNode> queue = new LinkedList<>();
+                Set<GraphNode> visited = new HashSet<>();
 
-            // Perform BFS traversal
-            while (!queue.isEmpty()) {
-                GraphNode currentNode = queue.poll();
-                if (currentNode == end) {
-                    // End node reached, reconstruct the path and return it
-                    return reconstructPath(parentMap, start, end);
-                }
+                queue.offer(start);
+                visited.add(start);
 
-                // Explore neighbors of the current node
-                for (GraphNode neighbor : getNeighbors(graph, currentNode)) {
-                    if (!visited.contains(neighbor)) {
-                        queue.offer(neighbor);
-                        visited.add(neighbor);
-                        // Record parent node for each neighbor
-                        parentMap.put(neighbor, currentNode);
+                while (!queue.isEmpty()) {
+                    GraphNode current = queue.poll();
+
+                    if (current.equals(end)) {
+                        return reconstructPath(parentMap, start, end);
+                    }
+
+                    for (GraphNode neighbor : current.getNeighbors()) {
+                        if (!visited.contains(neighbor)) {
+                            queue.offer(neighbor);
+                            visited.add(neighbor);
+                            parentMap.put(neighbor, current);
+                        }
                     }
                 }
+
+                return ""; // If no path is found
             }
 
-            // If end node is not reachable from the start node
-            return new ArrayList<>();
-        }
+            private static String reconstructPath(Map<GraphNode, GraphNode> parentMap, GraphNode start, GraphNode end) {
+                StringBuilder path = new StringBuilder();
+                GraphNode current = end;
 
-        private static List<GraphNode> getNeighbors(GraphNode[][] graph, GraphNode node) {
-            List<GraphNode> neighbors = new ArrayList<>();
-            int numRows = graph.length;
-            int numCols = graph[0].length;
-            int x = node.getX();
-            int y = node.getY();
+                while (!current.equals(start)) {
+                    GraphNode parent = parentMap.get(current);
+                    path.insert(0, getDirection(parent, current));
+                    current = parent;
+                }
 
-            // Add valid neighbors (adjacent nodes that are not walls)
-            if (x > 0 && !graph[x - 1][y].isWall()) {
-                neighbors.add(graph[x - 1][y]);
-            }
-            if (x < numRows - 1 && !graph[x + 1][y].isWall()) {
-                neighbors.add(graph[x + 1][y]);
-            }
-            if (y > 0 && !graph[x][y - 1].isWall()) {
-                neighbors.add(graph[x][y - 1]);
-            }
-            if (y < numCols - 1 && !graph[x][y + 1].isWall()) {
-                neighbors.add(graph[x][y + 1]);
+                return path.toString();
             }
 
-            return neighbors;
-        }
-
-        private static List<GraphNode> reconstructPath(java.util.Map<GraphNode, GraphNode> parentMap, GraphNode start, GraphNode end) {
-            List<GraphNode> path = new ArrayList<>();
-            GraphNode currentNode = end;
-            // Trace back the path from end node to start node using parentMap
-            while (currentNode != start) {
-                path.add(currentNode);
-                currentNode = parentMap.get(currentNode);
+            private static char getDirection(GraphNode from, GraphNode to) {
+                if (from.getX() == to.getX()) {
+                    return from.getY() < to.getY() ? 'R' : 'L';
+                } else {
+                    return from.getX() < to.getX() ? 'F' : 'B';
+                }
             }
-            // Add the start node
-            path.add(start);
-            // Reverse the path to get the correct order
-            java.util.Collections.reverse(path);
-            return path;
-        }
+
+    }
 }
 
 
