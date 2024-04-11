@@ -8,13 +8,11 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MazeGraph implements MazeType {
     private static final Logger logger = LogManager.getLogger();
+    private final Map<GraphNode, List<GraphNode>> mazeGraph = new HashMap<>();
     // Class to represent a cell in the maze
     // Convert maze to graph represented as an adjacency list
     Map<GraphNode, List<GraphNode>> mazeToGraph(List<List<Boolean>> maze) {
@@ -28,24 +26,24 @@ public class MazeGraph implements MazeType {
                     List<GraphNode> neighbors = new ArrayList<>();
                     // Check adjacent cells
                     if (i > 0 && !maze.get(i - 1).get(j)) {
-                        neighbors.add(new GraphNode(i - 1, j));
+                        neighbors.add(new GraphNode(i - 1, j, false));
                     }
                     if (i < rows - 1 && !maze.get(i + 1).get(j)) {
-                        neighbors.add(new GraphNode(i + 1, j));
+                        neighbors.add(new GraphNode(i + 1, j, false));
                     }
                     if (j > 0 && !maze.get(i).get(j - 1)) {
-                        neighbors.add(new GraphNode(i, j - 1));
+                        neighbors.add(new GraphNode(i, j - 1, false));
                     }
                     if (j < cols - 1 && !maze.get(i).get(j + 1)) {
-                        neighbors.add(new GraphNode(i, j + 1));
+                        neighbors.add(new GraphNode(i, j + 1, false));
                     }
-                    graph.put(new GraphNode(i, j), neighbors);
+                    mazeGraph.put(new GraphNode(i, j, false), neighbors);
                 }
             }
         }
-        return graph;
+        return mazeGraph;
     }
-    private static void connectAdjacentNodes(List<List<GraphNode>> graph) {
+    /*private static void connectAdjacentNodes(List<List<GraphNode>> graph) {
         int numRows = graph.size();
         int numCols = graph.get(0).size();
 
@@ -56,7 +54,7 @@ public class MazeGraph implements MazeType {
                     // Implement this based on your specific adjacency requirements
                 }
             }
-    }
+    }*/
 
     @Override
     public List<List<Boolean>> asList() {
@@ -64,8 +62,8 @@ public class MazeGraph implements MazeType {
     }
 
     @Override
-    public GraphNode[][] asGraph() {
-        return graph;
+    public Map<GraphNode, List<GraphNode>> asGraph() {
+        return mazeGraph;
     }
 }
 

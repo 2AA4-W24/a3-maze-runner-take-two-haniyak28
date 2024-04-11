@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Maze implements MazeType {
     private static final Logger logger = LogManager.getLogger();
@@ -168,7 +169,7 @@ public class Maze implements MazeType {
     }
 
     @Override
-    public GraphNode[][] asGraph() {
+    public Map<GraphNode, List<GraphNode>> asGraph() {
         throw new UnsupportedOperationException("Cannot represent list maze as graph");
     }
 }

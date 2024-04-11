@@ -6,12 +6,13 @@ import java.util.List;
 public class GraphNode {
     private int x;
     private int y;
-    //private boolean isWall;
+    private boolean isWall;
     private List<GraphNode> neighbors;
 
-    public GraphNode(int x, int y) {
+    public GraphNode(int x, int y, Boolean isWall) {
         this.x = x;
         this.y = y;
+        this.isWall = isWall;
         this.neighbors = new ArrayList<>();
     }
 
