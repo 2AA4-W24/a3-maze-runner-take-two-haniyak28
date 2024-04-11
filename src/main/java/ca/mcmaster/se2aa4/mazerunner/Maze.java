@@ -8,7 +8,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Maze {
+public class Maze implements MazeType {
     private static final Logger logger = LogManager.getLogger();
 
     private final List<List<Boolean>> maze = new ArrayList<>();
@@ -160,5 +160,15 @@ public class Maze {
         }
 
         return pos.equals(endPos);
+    }
+
+    @Override
+    public List<List<Boolean>> asList() {
+        return maze;
+    }
+
+    @Override
+    public GraphNode[][] asGraph() {
+        throw new UnsupportedOperationException("Cannot represent list maze as graph");
     }
 }
