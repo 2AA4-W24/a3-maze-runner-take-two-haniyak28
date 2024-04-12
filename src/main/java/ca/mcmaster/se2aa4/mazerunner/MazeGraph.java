@@ -10,130 +10,93 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
 
-public class MazeGraph implements MazeType {
+public class MazeGraph {
     private static final Logger logger = LogManager.getLogger();
     private final Map<GraphNode, List<GraphNode>> mazeGraph = new HashMap<>();
+    private final GraphNode StartNode;
+    private final GraphNode EndNode;
+
+
+
     // Class to represent a cell in the maze
     // Convert maze to graph represented as an adjacency list
-    Map<GraphNode, List<GraphNode>> mazeToGraph(List<List<Boolean>> maze) {
-        int rows = maze.size();
-        int cols = maze.get(0).size();
+    public MazeGraph(Maze maze) throws Exception{
+        int rows = maze.getSizeY();
+        int cols = maze.getSizeX();
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                if (!maze.get(i).get(j)) { // If it's an open space
+                Position currentPos = new Position(i, j);
+                if (!maze.isWall(currentPos)) { // If it's an open space
                     List<GraphNode> neighbors = new ArrayList<>();
                     // Check adjacent cells
-                    if (i > 0 && !maze.get(i - 1).get(j)) {
+                    if (i > 0 && !maze.isWall(currentPos.move(Direction.LEFT))) {
                         neighbors.add(new GraphNode(i - 1, j, false));
                     }
-                    if (i < rows - 1 && !maze.get(i + 1).get(j)) {
+                    if (i < rows - 1 && !maze.isWall(currentPos.move(Direction.RIGHT))) {
                         neighbors.add(new GraphNode(i + 1, j, false));
                     }
-                    if (j > 0 && !maze.get(i).get(j - 1)) {
+                    if (j > 0 && !maze.isWall(currentPos.move(Direction.DOWN))) {
                         neighbors.add(new GraphNode(i, j - 1, false));
                     }
-                    if (j < cols - 1 && !maze.get(i).get(j + 1)) {
+                    if (j < cols - 1 && !maze.isWall(currentPos.move(Direction.UP))) {
                         neighbors.add(new GraphNode(i, j + 1, false));
                     }
                     mazeGraph.put(new GraphNode(i, j, false), neighbors);
                 }
             }
         }
+        StartNode = StartNode(maze);
+        EndNode = EndNode(maze);
+    }
+
+    public Map<GraphNode, List<GraphNode>> getMazeGraph() {
         return mazeGraph;
     }
 
-    private Position StartNode() throws Exception {
-        for (int i = 0; i < maze.size(); i++) {
+
+    private GraphNode StartNode(Maze maze) throws Exception {
+        for (int i = 0; i < maze.getSizeY(); i++) {
             Position pos = new Position(0, i);
-            if (!isWall(pos)) {
-                return pos;
+            if (!maze.isWall(pos)) {
+                return new GraphNode(0, i, false);
             }
         }
         throw new Exception("Invalid maze (no start position available)");
     }
-    /*private static void connectAdjacentNodes(List<List<GraphNode>> graph) {
-        int numRows = graph.size();
-        int numCols = graph.get(0).size();
 
-            for (int i = 0; i < numRows; i++) {
-                for (int j = 0; j < numCols; j++) {
-                    GraphNode currentNode = graph.get(i).get(j);
-                    // Connect currentNode to its neighboring nodes if they are open spaces
-                    // Implement this based on your specific adjacency requirements
-                }
+    private GraphNode EndNode(Maze maze) throws Exception {
+        for (int i = 0; i < maze.getSizeY(); i++) {
+            Position pos = new Position(maze.getSizeX() - 1, i);
+            if (!maze.isWall(pos)) {
+                return new GraphNode(maze.getSizeX() - 1, i, false);
             }
-    }*/
-
-    @Override
-    public List<List<Boolean>> asList() {
-        throw new UnsupportedOperationException("Cannot represent graph maze as list");
+        }
+        throw new Exception("Invalid maze (no end position available)");
     }
 
-    @Override
-    public Map<GraphNode, List<GraphNode>> asGraph() {
-        return mazeGraph;
+    public GraphNode getStartNode() {
+        return StartNode;
     }
+
+    public GraphNode getEndNode() {
+        return EndNode;
+    }
+
+    /**
+     * Get start position.
+     *
+     * @return Start position
+     */
+    public Position getStartPos() {
+        return new Position(StartNode.getX(), StartNode.getY());
+    }
+
+    /**
+     * Get end position.
+     *
+     * @return End position
+     */
+    public Position getEndPos() { return new Position(EndNode.getX(), EndNode.getY()); }
+
 }
-
-/*import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
-
-public class MazeGraph implements MazeType {
-    private static final Logger logger = LogManager.getLogger();
-
-    private final List<List<Boolean>> maze = new ArrayList<>();
-    private final Graph graph = new Graph();
-
-    public MazeGraph(String filePath) throws Exception {
-        logger.debug("Reading the maze from file " + filePath);
-        BufferedReader reader = new BufferedReader(new FileReader(filePath));
-        String line;
-        int y = 0;
-        while ((line = reader.readLine()) != null) {
-            List<Boolean> newRow = new ArrayList<>();
-            for (int x = 0; x < line.length(); x++) {
-                char cell = line.charAt(x);
-                // Add true for walls, false for open paths
-                newRow.add(cell == '#');
-                if (cell != '#') {
-                    // Add node for each open cell
-                    Position pos = new Position(x, y);
-                    Node node = graph.addNode(pos);
-                    // Connect to neighboring cells
-                    connectNeighbors(pos, node);
-                }
-            }
-            maze.add(newRow);
-            y++;
-        }
-    }
-
-    private void connectNeighbors(Position pos, Node node) {
-        for (Direction dir : Direction.values()) {
-            Position neighborPos = pos.move(dir);
-            if (isValidPosition(neighborPos) && !isWall(neighborPos)) {
-                Node neighborNode = graph.getNode(neighborPos);
-                if (neighborNode != null) {
-                    graph.addEdge(node, neighborNode);
-                }
-            }
-        }
-    }
-
-    private boolean isValidPosition(Position pos) {
-        int x = pos.x();
-        int y = pos.y();
-        return x >= 0 && x < maze.get(0).size() && y >= 0 && y < maze.size();
-    }
-
-    private boolean isWall(Position pos) {
-        int x = pos.x();
-        int y = pos.y();
-        return maze.get(y).get(x);
-    }
-
-    // Implement other methods as needed for maze operations
-}*/

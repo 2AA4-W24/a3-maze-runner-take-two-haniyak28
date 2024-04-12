@@ -9,11 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Maze implements MazeType {
+public class Maze {
     private static final Logger logger = LogManager.getLogger();
-
     private final List<List<Boolean>> maze = new ArrayList<>();
-
     private final Position start;
     private final Position end;
 
@@ -49,7 +47,12 @@ public class Maze implements MazeType {
      * @throws Exception If no valid start position exists
      */
     private Position findStart() throws Exception {
-        for (int i = 0; i < maze.size(); i++) {
+        if (maze.isEmpty() || maze.get(0).isEmpty()) {
+            throw new Exception("empty maze");
+        }
+        int numRows = maze.size();
+
+        for (int i = 0; i < numRows; i++) {
             Position pos = new Position(0, i);
             if (!isWall(pos)) {
                 return pos;
@@ -65,8 +68,14 @@ public class Maze implements MazeType {
      * @throws Exception If no valid end position exists
      */
     private Position findEnd() throws Exception {
-        for (int i = 0; i < maze.size(); i++) {
-            Position pos = new Position(maze.getFirst().size() - 1, i);
+        if (maze.isEmpty() || maze.get(0).isEmpty()) {
+            throw new Exception("empty maze");
+        }
+        int numRows = maze.size();
+        int numCols = maze.get(0).size();
+
+        for (int i = 0; i < numRows; i++) {
+            Position pos = new Position(numCols - 1, i);
             if (!isWall(pos)) {
                 return pos;
             }
@@ -81,7 +90,7 @@ public class Maze implements MazeType {
      * @return If position is a wall
      */
     public Boolean isWall(Position pos) {
-        return maze.get(pos.y()).get(pos.x());
+        return maze.get(pos.x()).get(pos.y());
     }
 
     /**
@@ -108,7 +117,7 @@ public class Maze implements MazeType {
      * @return Horizontal size
      */
     public int getSizeX() {
-        return this.maze.getFirst().size();
+        return this.maze.get(0).size();
     }
 
     /**
@@ -161,15 +170,5 @@ public class Maze implements MazeType {
         }
 
         return pos.equals(endPos);
-    }
-
-    @Override
-    public List<List<Boolean>> asList() {
-        return maze;
-    }
-
-    @Override
-    public Map<GraphNode, List<GraphNode>> asGraph() {
-        throw new UnsupportedOperationException("Cannot represent list maze as graph");
     }
 }
