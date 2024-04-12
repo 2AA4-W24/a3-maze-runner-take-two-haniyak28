@@ -24,7 +24,9 @@ public class BFSSolver implements MazeSolver{
             GraphNode current = queue.poll();
 
             if (current.equals(maze.getEndNode())) {
-                return new Path(reconstructPath(parentMap, maze.getStartNode(), maze.getEndNode()));
+                Path path = new Path(reconstructPath(parentMap, maze.getStartNode(), maze.getEndNode()));
+                logger.debug("Current Path: " + path.getCanonicalForm());
+                return path;
                 //return reconstructPath(parentMap, maze.getStartNode(), maze.getEndNode());
             }
 
