@@ -46,4 +46,8 @@ public class GraphNode {
     public boolean hasNeighbor(GraphNode neighbor) {
         return neighbors.contains(neighbor);
     }
+
+    public boolean isWall() {
+        return isWall;
+    }
 }

@@ -171,4 +171,7 @@ public class Maze {
 
         return pos.equals(endPos);
     }
+
+    public void setWall(int i, int i1, boolean b) {
+    }
 }
